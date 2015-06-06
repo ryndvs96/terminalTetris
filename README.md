@@ -1,2 +1,2 @@
 # terminalTetris
-In-Terminal Tetris Game
+In-Terminal Tetris Game using ncurses
