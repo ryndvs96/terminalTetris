@@ -1,0 +1,24 @@
+package blocks;
+
+import java.io.File;
+import java.util.Scanner;
+
+public class BlockAnalysis {
+	final static String fileName = "/home/ryan/tetris/terminalTetris/pentris/src/blocks/blockLog.txt";
+	public static void main(String[] args) {
+		Scanner scan = null;
+		File file = new File(fileName);
+		try {
+			scan = new Scanner(file);
+			while (scan.hasNextLine()) {
+				String block = scan.nextLine();
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			scan.close();
+		}
+	}
+}

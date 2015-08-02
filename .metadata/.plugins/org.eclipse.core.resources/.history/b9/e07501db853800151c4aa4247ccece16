@@ -1,0 +1,8 @@
+package blocks;
+
+public class BlockAnalysis {
+	final static String fileName = "/home/ryan/tetris/terminalTetris/pentris/src/blocks/blockLog.txt";
+	public static void main(String[] args) {
+		
+	}
+}

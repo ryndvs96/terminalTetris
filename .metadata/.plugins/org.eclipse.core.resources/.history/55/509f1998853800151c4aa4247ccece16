@@ -1,0 +1,8 @@
+package blocks;
+
+public class BlockAnalysis {
+	
+	public static void main(String[] args) {
+		
+	}
+}

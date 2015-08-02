@@ -3,7 +3,7 @@ package blocks;
 import java.util.ArrayList;
 public class BlockAlgorithm1 {
 	public static void main(String[] args) {
-		int size = 7;
+		int size = 9;
 		long time1 = System.currentTimeMillis();
 		Blocks blocks = (new BlockAlgorithm1()).new Blocks(size);
 		blocks.build();
