@@ -1,0 +1,135 @@
+package blocks;
+
+public class Tester {
+	private static int size = 7;
+	private static char one = '1';
+	private char zero = '0';
+	public static void main(String[] args) {
+		char[][] block1 = { {'0', '1', '0', '0', '0', '0', '0'},
+							{'1', '1', '0', '0', '0', '0'},
+							{'0', '1', '1', '0', '0'},
+							{'0', '1', '0', '0'},
+							{'0', '1', '0'},
+							{'0', '0'},
+							{'0'}};
+		char[][] block2 = { {'0', '1', '0', '0', '0', '0', '0'},
+							{'0', '1', '0', '0', '0', '0'},
+							{'1', '1', '0', '0', '0'},
+							{'0', '1', '1', '0'},
+							{'0', '1', '0'},
+							{'0', '0'},
+							{'0'}};
+		int rot1 = calculateRotation(block1);
+		int rot2 = calculateRotation(block2);
+		int block = 0;
+	}
+	private static int calculateRotation(char[][] block) {
+		int[] rows = new int[size];
+		int[] cols = new int[size];
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j + i < size; j++) {
+				if (block[i][j] == one) {
+					rows[i]++;
+					cols[j]++;
+				}
+			}
+		}
+		int rowTop = 0, colLeft = 0, rowBot = 0, colRight = 0;
+		int xLeft = -1, xRight = -1, yTop = -1, yBot = -1;
+		for (int i = 0; i < size; i++) {
+			if (rows[i] > 0 && rowTop == 0) {
+				rowTop = rows[i];
+				yTop = i;
+			}
+			if (rows[size - i - 1] > 0 && rowBot == 0) {
+				rowBot = rows[size - i - 1];
+				yBot = size - i;
+			}
+			if (cols[i] > 0 && colLeft == 0) {
+				colLeft = cols[i];
+				xLeft = i;
+			}
+			if (cols[size - 1 - i] > 0 && colRight == 0) {
+				colRight = cols[size - i - 1];
+				xRight = size - i;
+			}
+		}
+		int piece = 0;
+		if (rowTop == colLeft && rowTop == rowBot && rowTop == colRight) {
+			int height = yBot - yTop;
+			int width = xRight - xLeft;
+			int topHalf = 0, botHalf = 0, leftHalf = 0, rightHalf = 0;
+			int i = 0;
+			for (i = 0; i < height / 2; i++) {
+				topHalf += rows[i];
+			}
+			for (i += height % 2; i < height; i++) {
+				botHalf += rows[i];
+			}
+			for (i = 0; i < width / 2; i++) {
+				leftHalf += cols[i];
+			}
+			for (i += width % 2; i < width; i++) {
+				rightHalf += cols[i];
+			}
+			if (topHalf > botHalf) {
+				if (leftHalf > rightHalf) {
+					return 0;
+				}
+				if (rightHalf > leftHalf) {
+					return 1;
+				}
+				else {
+					return 0;
+				}
+			}
+			else if (botHalf > topHalf) {
+				if (leftHalf > rightHalf) {
+					return 3;
+				}
+				else if (rightHalf > leftHalf) {
+					return 2;
+				}
+				else {
+					return 2;
+				}
+			}
+			else {
+				if (leftHalf > rightHalf) {
+					return 3;
+				}
+				else if (rightHalf > leftHalf) {
+					return 1;
+				}
+				else {
+					return 0;
+				}
+			}
+		}
+		if (rowTop >= colLeft && rowTop >= rowBot && rowTop >= colRight) {
+			piece = 1;
+		}
+		if (rowBot >= colLeft && rowBot >= rowTop && rowBot >= colRight) {
+			piece = 3;
+		}
+		if (colRight >= colLeft && colRight >= rowTop && colRight >= rowBot) {
+			piece = 2;
+		}
+		if (rowTop == rowBot && rowTop > colRight && colRight == colLeft) {
+			piece = 1;
+		}
+		if (rowTop == colLeft && rowTop > colRight && colRight == rowBot) {
+			piece = 0;
+		}
+		if (rowTop == colRight && rowTop > colLeft && colLeft == rowBot) {
+			piece = 1;
+		}
+		if (rowBot == colLeft && rowBot > colRight && colRight == rowTop) {
+			piece = 3;
+		}
+		if (rowBot == colRight && rowBot > colLeft && colLeft == rowTop) {
+			piece = 2;
+		}
+		return piece % 4;
+	}
+}

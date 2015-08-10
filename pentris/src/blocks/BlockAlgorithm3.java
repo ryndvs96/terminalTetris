@@ -1,36 +1,38 @@
 package blocks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 public class BlockAlgorithm3 {
 	public static void main(String[] args) {
-		int size = 9; // must be 10 or less
+		int size = 9; // must be 11 or less
 		long time1 = System.currentTimeMillis();
 		Blocks blocks = (new BlockAlgorithm3()).new Blocks(size);
 		blocks.build();
-		blocks.print(true);
+		blocks.print(true, null);
 		long time2 = System.currentTimeMillis();
-//		blocks.finalPrint();
 		double time = ((double) (time2 - time1)) / 1000;
 		String newBlocks = String.valueOf(blocks.getNewBlocks());
 		System.out.println(time + " seconds : " + comma(newBlocks) 
-				+ " new Blocks() : For " + size + " block piece.");
+				+ " new Blocks() : " + 0.0 + " bytes used : For " + size + " block piece.");
 	}
 	public class Blocks {
 		public Map<String, Object> blocks = new HashMap<String, Object>();
+		public ArrayList<String> toDecrypt = new ArrayList<String>();
 		private char one = '1';
 		private char zero = '0';
 		private long newBlocks = 0;
-		private long currentNewBlocks = 0;
-		private long currentTime = 0;
 		private int size = 0;
+		private int iteratedSize = 0;
 
 		public Blocks(int size) {
 			this.size = size;
+			for (int i = size; i > 0; i--) {
+				iteratedSize += i;
+			}
 		}
 
 		public void build() {
-			currentTime = System.currentTimeMillis();
 			char[][] block = newBlock();
 			block[0][0] = one;
 			build(block, 1);
@@ -77,7 +79,6 @@ public class BlockAlgorithm3 {
 			if (times == 0) {
 				return block;
 			}
-			// calculate adjustment
 			int[] rows = new int[size];
 			int[] cols = new int[size];
 			boolean breaker = false;
@@ -195,10 +196,6 @@ public class BlockAlgorithm3 {
 			int[] rows = new int[size];
 			int[] cols = new int[size];
 			for (int i = 0; i < size; i++) {
-				rows[i] = 0;
-				cols[i] = 0;
-			}
-			for (int i = 0; i < size; i++) {
 				for (int j = 0; j + i < size; j++) {
 					if (block[i][j] == one) {
 						rows[i]++;
@@ -206,50 +203,188 @@ public class BlockAlgorithm3 {
 					}
 				}
 			}
-			int rowTop = 0;
-			int colLeft = 0;
-			int rowBot = 0;
-			int colRight = 0;
+			int xLeft = -1, xRight = -1, yTop = -1, yBot = -1;
 			for (int i = 0; i < size; i++) {
-				if (rows[i] > 0 && rowTop == 0) {
-					rowTop = rows[i];
+				if (rows[i] > 0 && yTop == -1) {
+					yTop = i;
 				}
-				if (rows[size - i - 1] > 0 && rowBot == 0) {
-					rowBot = rows[size - i - 1];
+				if (rows[size - i - 1] > 0 && yBot == -1) {
+					yBot = size - i;
 				}
-				if (cols[i] > 0 && colLeft == 0) {
-					colLeft = cols[i];
+				if (cols[i] > 0 && xLeft == -1) {
+					xLeft = i;
 				}
-				if (cols[size - 1 - i] > 0 && colRight == 0) {
-					colRight = cols[size - i - 1];
+				if (cols[size - 1 - i] > 0 && xRight == -1) {
+					xRight = size - i;
+				}
+				if (xLeft > -1 && xRight > -1 && yTop > -1 && yBot > -1) {
+					break;
 				}
 			}
-			int piece = 0;
-			if (rowTop >= colLeft && rowTop >= rowBot && rowTop >= colRight) {
-				piece = 1;
+			double height = yBot - yTop;
+			double width = xRight - xLeft;
+			double xComTop = 0;
+			double yComTop = 0;
+			for (int i = 0; i < cols.length; i++) {
+				if (cols[i] > 0) {
+					xComTop += ((i + 0.5) * cols[i]);
+				}
 			}
-			if (rowBot >= colLeft && rowBot >= rowTop && rowBot >= colRight) {
-				piece = 3;
+			for (int i = 0; i < rows.length; i++) {
+				if (rows[i] > 0) {
+					yComTop += ((i + 0.5) * rows[i]);
+				}
 			}
-			if (colRight >= colLeft && colRight >= rowTop && colRight >= rowBot) {
-				piece = 2;
+			double xCom = ((double) xComTop) / ((double) size);
+			double yCom = ((double) yComTop) / ((double) size);
+			if (xCom > width / 2) {
+				if (yCom > height / 2) {
+					return 2;
+				}
+				else if (yCom < height / 2) {
+					return 1;
+				}
+				else {
+					return 1;
+				}
 			}
-			if (rowTop == rowBot && rowTop > colRight && colRight == colLeft) {
-				piece = 1;
+			else if (xCom < width / 2) {
+				if (yCom > height / 2) {
+					return 3;
+				}
+				else if (yCom < height / 2) {
+					return 0;
+				}
+				else {
+					return 3;
+				}
 			}
-			if (rowTop == colLeft && rowTop > colRight && colRight == rowBot) {
-				piece = 0;
+			else {
+				if (yCom > height / 2) {
+					return 2;
+				}
+				else if (yCom < height / 2) {
+					return 0;
+				}
+				else {
+					double topHalf = 0.0, bottomHalf = 0.0;
+					double leftHalf = 0.0, rightHalf = 0.0;
+					for (int i = 1; i < width / 2; i++) {
+						if (cols[i - 1] > 0) {
+							leftHalf += cols[i - 1];
+						}
+					}
+					for (int i = (int) width - 1; i > width / 2; i--) {
+						if (cols[i] > 0) {
+							rightHalf += cols[i];
+						}
+					}
+					for (int i = 1; i < height / 2; i++) {
+						if (rows[i - 1] > 0) {
+							topHalf += rows[i - 1];
+						}
+					}
+					for (int i = (int) height - 1; i > height / 2; i--) {
+						if (rows[i] > 0) {
+							bottomHalf += rows[i];
+						}
+					}
+					int rotation = -1;
+					if (topHalf > bottomHalf) {
+						if (leftHalf > rightHalf) {
+							rotation = 0;
+						}
+						else if (leftHalf < rightHalf) {
+							rotation = 1;
+						}
+						else {
+							rotation = 0;
+						}
+					}
+					else if (topHalf < bottomHalf) {
+						if (leftHalf > rightHalf) {
+							rotation = 3;
+						}
+						else if (leftHalf < rightHalf) {
+							rotation = 2;
+						}
+						else {
+							rotation = 2;
+						}
+					}
+					else {
+						if (leftHalf > rightHalf) {
+							rotation = 3;
+						}
+						else if (leftHalf < rightHalf) {
+							rotation = 1;
+						}
+						else {
+							rotation = -1;
+						}
+					}
+					if (rotation == -1) {
+						double topLeftHalf = 0.0, bottomLeftHalf = 0.0;
+						double topRightHalf = 0.0, bottomRightHalf = 0.0;
+						for (int i = 1; i < width / 2; i++) {
+							for (int j = 1; j < height / 2; j++) {
+								if (block[j - 1][i - 1] == one) {
+									topLeftHalf++;
+								}
+							}
+							for (int j = (int) height - 1; j > height / 2; j--) {
+								if (block[j][i - 1] == one) {
+									bottomLeftHalf++;
+								}
+							}
+						}
+						for (int i = (int) width - 1; i > width / 2; i--) {
+							for (int j = 1; j < height / 2; j++) {
+								if (block[j - 1][i] == one) {
+									topRightHalf++;
+								}
+							}
+							for (int j = (int) height - 1; j > height / 2; j--) {
+								if (block[j][i] == one) {
+									bottomRightHalf++;
+								}
+							}
+						}
+						if (topLeftHalf > topRightHalf && topLeftHalf > bottomRightHalf && topLeftHalf > bottomLeftHalf) {
+							return 0;
+						}
+						else if (topRightHalf > topLeftHalf && topRightHalf > bottomRightHalf && topRightHalf > bottomLeftHalf) {
+							return 1;
+						}
+						else if (bottomRightHalf > topRightHalf && bottomRightHalf > topLeftHalf && bottomRightHalf > bottomLeftHalf) {
+							return 2;
+						}
+						else if (bottomLeftHalf > topRightHalf && bottomLeftHalf > bottomRightHalf && bottomLeftHalf > topLeftHalf) {
+							return 3;
+						}
+						else {
+							if (blockCheck(format(block, 1))) {
+								return 1;
+							}
+							else if (blockCheck(format(block, 2))) {
+								return 2;
+							}
+							else if (blockCheck(format(block, 3))) {
+								return 3;
+							}
+							if (width > height) {
+								return 1;
+							}
+							else {
+								return 0;
+							}
+						}
+					}
+					else {
+						return rotation;
+					}
+				}
 			}
-			if (rowTop == colRight && rowTop > colLeft && colLeft == rowBot) {
-				piece = 1;
-			}
-			if (rowBot == colLeft && rowBot > colRight && colRight == rowTop) {
-				piece = 3;
-			}
-			if (rowBot == colRight && rowBot > colLeft && colLeft == rowTop) {
-				piece = 2;
-			}
-			return piece % 4;
 		}
 
 		private char[][] format(char[][] block) {
@@ -264,16 +399,7 @@ public class BlockAlgorithm3 {
 		}
 		private void add(char[][] block) {
 			block = format(block);
-			if (blockCheck(format(block, 0))) {
-				return;
-			}
-			if (blockCheck(format(block, 1))) {
-				return;
-			}
-			if (blockCheck(format(block, 2))) {
-				return;
-			}
-			if (blockCheck(format(block, 3))) {
+			if (blockCheck(block)) {
 				return;
 			}
 			addToList(block);
@@ -281,7 +407,7 @@ public class BlockAlgorithm3 {
 		private void addToList(char[][] block) {
 			String key = getKeyString(block);
 			blocks.put(key, null);
-			print(false);
+			print(false, key);
 		}
 		private String getKeyString(char[][] block) {
 			char[] keyChars = new char[size];
@@ -314,41 +440,62 @@ public class BlockAlgorithm3 {
 				}
 			}
 			String key = String.valueOf(keyChars);
-			//			compress(key);
 			return key;
 		}
-		public void print(boolean end) {
-			long time2 = System.currentTimeMillis();
-			double time = ((double) (time2 - currentTime)) / 1000;
+		public void print(boolean end, String key) {
 			String print = null;
 			if (!end) {
-				print = String.format("%4d--- %1.3f seconds : used %10s newBlocks()", blocks.size(),
-						time, comma(String.valueOf(newBlocks - currentNewBlocks)));
+				print = String.format("%7d--- %s", blocks.size(), key);
 			}
 			else {
-				print = String.format(" END--- %1.3f seconds : used %10s newBlocks()",
-						time, comma(String.valueOf(newBlocks - currentNewBlocks)));
+				print = String.format("    END--- %s newBlocks()", comma(String.valueOf(newBlocks)));
 			}
 			System.out.println(print);
-			currentNewBlocks = newBlocks;
-			currentTime = System.currentTimeMillis();
 		}
-		public void finalPrint() {
-			Object[] keySet = blocks.keySet().toArray();
-			for (int k = 0; k < keySet.length; k++) {
-				String key = (String) keySet[k];
-				//				System.out.println("---------------------" + (k + 1));
-				//				int pos = 0;
-				//				for (int i = 0; i < size; i++) {
-				//					String print = key.substring(pos, pos + (size - i));
-				//					pos += (size - i);
-				//					for (int j = 0; j < print.length(); j++) {
-				//						System.out.print(print.charAt(j) == 1 ? "o " : "  ");
-				//					}
-				//					System.out.println();
-				//				}
-				System.out.println(key);
+		public void decrypt() {
+			Object[] arr = blocks.keySet().toArray();
+			for (int i = 0; i < arr.length; i++) {
+				char[] key = ((String) arr[i]).toCharArray();
+				System.out.println("------------------" + (i + 1) + " : " + blocks.get(String.valueOf(key)));
+				char[] act = new char[iteratedSize];
+				for (int j = 0, count = 0, tot = 0; tot < size && j < key.length; j++) {
+					char val = key[j];
+					if (val >= 65) {
+						int spaces = val - 65;
+						act[count] = '1';
+						tot++;
+						count++;
+						for (int k = 0; k < spaces; k++) {
+							count++;
+						}
+						act[count] = '1';
+						tot++;
+						count++;
+					}
+					else {
+						int spaces = val - 48;
+						for (int k = 0; k < spaces; k++) {
+							count++;
+						}
+						act[count] = '1';
+						tot++;
+						count++;
+					}
+				}
+				for (int j = size, count = 0; j > 0; j--) {
+					for (int k = 0; k < j; k++) {
+						if (act[count + k] == '1') {
+							System.out.print("O ");
+						}
+						else {
+							System.out.print("  ");
+						}
+					}
+					count += j;
+					System.out.println();
+				}
 			}
+			System.out.println(arr.length);
 		}
 		private char[][] newBlock() {
 			newBlocks++;
@@ -391,5 +538,6 @@ public class BlockAlgorithm3 {
 		}
 	}
 }
+
 
 

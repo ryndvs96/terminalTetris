@@ -1,0 +1,76 @@
+package blocks;
+
+public class Tester {
+	private int size = 7;
+	private char one = '1';
+	private char zero = '0';
+	public static void main(String[] args) {
+		char[][] block1 = { {'0', '1', '0', '0', '0', '0', '0'},
+							{'1', '1', '0', '0', '0', '0'},
+							{'0', '1', '1', '0', '0'},
+							{'0', '1', '0', '0'},
+							{'0', '1', '0'},
+							{'0', '0'},
+							{'0'}};
+	}
+	private int calculateRotation(char[][] block) {
+		int[] rows = new int[size];
+		int[] cols = new int[size];
+		for (int i = 0; i < size; i++) {
+			rows[i] = 0;
+			cols[i] = 0;
+		}
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j + i < size; j++) {
+				if (block[i][j] == one) {
+					rows[i]++;
+					cols[j]++;
+				}
+			}
+		}
+		int rowTop = 0;
+		int colLeft = 0;
+		int rowBot = 0;
+		int colRight = 0;
+		for (int i = 0; i < size; i++) {
+			if (rows[i] > 0 && rowTop == 0) {
+				rowTop = rows[i];
+			}
+			if (rows[size - i - 1] > 0 && rowBot == 0) {
+				rowBot = rows[size - i - 1];
+			}
+			if (cols[i] > 0 && colLeft == 0) {
+				colLeft = cols[i];
+			}
+			if (cols[size - 1 - i] > 0 && colRight == 0) {
+				colRight = cols[size - i - 1];
+			}
+		}
+		int piece = 0;
+		if (rowTop >= colLeft && rowTop >= rowBot && rowTop >= colRight) {
+			piece = 1;
+		}
+		if (rowBot >= colLeft && rowBot >= rowTop && rowBot >= colRight) {
+			piece = 3;
+		}
+		if (colRight >= colLeft && colRight >= rowTop && colRight >= rowBot) {
+			piece = 2;
+		}
+		if (rowTop == rowBot && rowTop > colRight && colRight == colLeft) {
+			piece = 1;
+		}
+		if (rowTop == colLeft && rowTop > colRight && colRight == rowBot) {
+			piece = 0;
+		}
+		if (rowTop == colRight && rowTop > colLeft && colLeft == rowBot) {
+			piece = 1;
+		}
+		if (rowBot == colLeft && rowBot > colRight && colRight == rowTop) {
+			piece = 3;
+		}
+		if (rowBot == colRight && rowBot > colLeft && colLeft == rowTop) {
+			piece = 2;
+		}
+		return piece % 4;
+	}
+}

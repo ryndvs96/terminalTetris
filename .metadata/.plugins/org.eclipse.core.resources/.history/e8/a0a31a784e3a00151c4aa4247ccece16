@@ -1,0 +1,95 @@
+package blocks;
+
+public class Tester {
+	private static int size = 9;
+	private static char one = '1';
+	private char zero = '0';
+	public static void main(String[] args) {
+		char[][] block1 = { {'1', '1', '0', '0', '0', '0', '0', '0', '0'},
+							{'0', '1', '1', '1', '0', '0', '0', '0'},
+							{'0', '1', '0', '0', '0', '0', '0'},
+							{'0', '1', '0', '0', '0', '0'},
+							{'1', '1', '0', '0', '0'},
+							{'0', '0', '0', '0'},
+							{'0', '0', '0'},
+							{'0', '0'},
+							{'0'}};
+		char[][] block2 = { {'0', '1', '0', '0', '0', '0', '0', '0', '0'},
+							{'0', '1', '0', '0', '0', '0', '0', '0'},
+							{'1', '1', '1', '1', '1', '0', '0'},
+							{'1', '0', '0', '0', '1', '0'},
+							{'0', '0', '0', '0', '0'},
+							{'0', '0', '0', '0'},
+							{'0', '0', '0'},
+							{'0', '0'},
+							{'0'}};
+		int rot1 = calculateRotation(block1);
+		int rot2 = calculateRotation(block2);
+		System.out.println("rot1 = " + rot1);
+		System.out.println("rot2 = " + rot2);
+	}
+	private static int calculateRotation(char[][] block) {
+		int[] rows = new int[size];
+		int[] cols = new int[size];
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j + i < size; j++) {
+				if (block[i][j] == one) {
+					rows[i]++;
+					cols[j]++;
+				}
+			}
+		}
+		int xLeft = -1, xRight = -1, yTop = -1, yBot = -1;
+		for (int i = 0; i < size; i++) {
+			if (rows[i] > 0 && yTop == -1) {
+				yTop = i;
+			}
+			if (rows[size - i - 1] > 0 && yBot == 0) {
+				yBot = size - i;
+			}
+			if (cols[i] > 0 && xLeft == 0) {
+				xLeft = i;
+			}
+			if (cols[size - 1 - i] > 0 && xRight == 0) {
+				xRight = size - i;
+			}
+			if ((yTop + yBot + xLeft + xRight) >= 0) {
+				break;
+			}
+		}
+		double height = yBot - yTop;
+		double width = xRight - xLeft;
+		int xComTop = 0;
+		int yComTop = 0;
+		for (int i = 0; i < cols.length; i++) {
+			if (cols[i] > 0) {
+				xComTop += ((i + 1) * cols[i]);
+			}
+		}
+		for (int i = 0; i < cols.length; i++) {
+			if (cols[i] > 0) {
+				yComTop += ((i + 1) * cols[i]);
+			}
+		}
+		double xCom = ((double) xComTop) / ((double) size);
+		double yCom = ((double) yComTop) / ((double) size);
+		boolean xComGHalf = xCom > width / 2;
+		boolean yComGreaterThanHalf = yCom > height / 2;
+		if (xComGHalf) {
+			if (yComGreaterThanHalf) {
+				return 1;
+			}
+			else {
+				return 2;
+			}
+		}
+		else {
+			if (yComGreaterThanHalf) {
+				return 3;
+			}
+			else {
+				return 0;
+			}
+		}
+	}
+}

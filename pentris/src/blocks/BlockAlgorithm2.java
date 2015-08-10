@@ -302,14 +302,14 @@ public class BlockAlgorithm2 {
 //			compress(key);
 			return key;
 		}
-		private String compress(String key) {
-			Object[] tags = compressMap.keySet().toArray();
-			for (int i = 0; i < tags.length; i++) {
-				String tag = (String) tags[i];
-				key = key.replaceAll(tag, compressMap.get(tag));
-			}
-			return key;
-		}
+//		private String compress(String key) {
+//			Object[] tags = compressMap.keySet().toArray();
+//			for (int i = 0; i < tags.length; i++) {
+//				String tag = (String) tags[i];
+//				key = key.replaceAll(tag, compressMap.get(tag));
+//			}
+//			return key;
+//		}
 		public void print(boolean end) {
 			long time2 = System.currentTimeMillis();
 			double time = ((double) (time2 - currentTime)) / 1000;

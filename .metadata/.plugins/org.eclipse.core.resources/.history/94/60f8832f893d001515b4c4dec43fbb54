@@ -1,0 +1,626 @@
+package blocks;
+
+import java.util.HashMap;
+import java.util.Map;
+public class BlockAlgorithm3 {
+	public static void main(String[] args) {
+		int size = 9; // must be 11 or less
+		long time1 = System.currentTimeMillis();
+		Blocks blocks = (new BlockAlgorithm3()).new Blocks(size);
+		blocks.build();
+		blocks.print(true, null);
+		long time2 = System.currentTimeMillis();
+		double time = ((double) (time2 - time1)) / 1000;
+		
+		String newBlocks = String.valueOf(blocks.getNewBlocks());
+		System.out.println(String.format(time + " seconds : " + comma(newBlocks) 
+				+ " new Blocks() : %.3f megabytes used : For " + size + " block piece.", 0d));
+	}
+	public class Blocks {
+		public Map<String, Object> blocks = null;
+		private char one = '1';
+		private char zero = '0';
+		private long newBlocks = 0;
+		private int size = 0;
+		private int iteratedSize = 0;
+
+		public Blocks(int size) {
+			int i = 0;
+			//////////////////////
+			
+			this.blocks = new HashMap<String, Object>();
+			this.size = size;
+			for (i = size; i > 0; i--) {
+				this.iteratedSize += i;
+			}
+		}
+
+		public void build() {
+			int i = 0, j = 0, k = 0; 
+			int halfsize = 0;
+			int round = 0;
+			
+			char[][] block = null;
+			//////////////////////
+			
+			block = newBlock();
+			block[0][0] = one;
+			build(block, 1);
+			if (size >= 5) {
+				halfsize = size % 2 == 0 ? (size / 2) : (size - 1) / 2;
+				for (i = 1; i < halfsize; i++) {
+					for (j = 1, round = 0; j < halfsize; j++) {
+						round = 0;
+						block = newBlock();
+						for (k = 0; k < j; k++) {
+							block[i][k] = one;
+							round++;
+						}
+						for (k = 0; k < i; k++) {
+							block[k][j] = one;
+							round++;
+						}
+						block[i][j] = one;
+						round++;
+						build(block, round);
+					}
+				}
+			}
+		}
+		
+		private void build(char[][] block, int round) {
+			int i = 0, j = 0;
+			
+			char[][] copy = null;
+			//////////////////////
+			
+			if (round < size) {
+				for (i = 0; i < size; i++) {
+					for (j = 0; j + i < size && j + i <= round; j++) {
+						if (cellCheck(block, i, j)) {
+							copy = blockCopy(block);
+							copy[i][j] = one;
+							build(copy, round + 1);
+						}
+					}
+				}
+			}
+			else {
+				add(block);
+			}
+		}
+		private char[][] rotate(char[][] block, int times) {
+			if (times == 0) {
+				return block;
+			}
+
+			//////////////////////
+			int i = 0, j = 0;
+			int newi = 0;
+			int newj = 0;
+			int up = 0;
+			int left = 0;
+			boolean breaker = false;
+			
+			int[] rows = null;
+			int[] cols = null;
+			char[][] copy = null;
+			//////////////////////
+			
+			rows = new int[size];
+			cols = new int[size];
+			breaker = false;
+			for (i = 0; i < size; i++) {
+				for (j = 0; j + i < size; j++) {
+					if (block[i][j] == one) {
+						rows[i]++;
+						breaker = true;
+						break;
+					}
+				}
+				if (breaker) {
+					break;
+				}
+			}
+			breaker = false;
+			for (i = size - 1; i >= 0 ; i--) {
+				for (j = 0; j + i < size; j++) {
+					if (block[j][i] == one) {
+						cols[size - i - 1]++;
+						breaker = true;
+						break;
+					}
+				}
+				if (breaker) {
+					break;
+				}
+			}
+			left = -1;
+			up = -1;
+			for (i = 0; i < size; i++) {
+				if (rows[i] > 0 && left == -1) {
+					left = i;
+					break;
+				}
+			}
+			for (i = 0; i < size; i++) {
+				if (cols[i] > 0 && up == -1) {
+					up = i;
+					break;
+				}
+			}
+			copy = newBlock();
+			for (i = 0; i < size; i++) {
+				for (j = 0; j + i < size; j++) {
+					newi = size - 1 - j - up;
+					newj = i - left;
+					if (newi < 0 || newj < 0 || (newi + newj >= size)) {
+						continue;
+					}
+					copy[newi][newj] = block[i][j];
+				}
+			}
+			
+			if (times > 1) {
+				return rotate(copy, times - 1);
+			}
+			else {
+				return copy;
+			}
+		}
+		
+		private boolean cellCheck(char[][] block, int i, int j) {
+			int nullCount = 0;
+			//////////////////////
+
+			nullCount = 0;
+			if (block[i][j] == one) {
+				return false;
+			}
+			try {
+				if (block[i + 1][j] != one) {
+					nullCount++;
+				}
+			} catch (Exception e) {
+				nullCount++;
+			}
+			try {
+				if (block[i - 1][j] != one) {
+					nullCount++;
+				}
+			} catch (Exception e) {
+				nullCount++;
+			}
+			try {
+				if (block[i][j + 1] != one) {
+					nullCount++;
+				}
+			} catch (Exception e) {
+				nullCount++;
+			}
+			try {
+				if (block[i][j - 1] != one) {
+					nullCount++;
+				}
+			} catch (Exception e) {
+				nullCount++;
+			}
+			if (nullCount != 4) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		private char[][] blockCopy(char[][] block) {
+			int i = 0, j = 0;
+			
+			char[][] blockCopy = null;
+			//////////////////////
+			
+			blockCopy = newBlock();
+			for (i = 0; i < size; i++) {
+				for (j = 0; j + i < size; j++) {
+					blockCopy[i][j] = block[i][j];
+				}
+			}
+			return blockCopy;
+		}
+		private boolean blockCheck(char[][] block) {
+			return blocks.containsKey(getKeyString(block));
+		}
+		private int calculateRotation(char[][] block) {
+			int i = 0, j = 0;
+			
+			int xLeftIndex = -1;
+			int xRightIndex = -1;
+			int yTopIndex = -1;
+			int yBotIndex = -1;
+			
+			int rotation = -1;
+
+			double height = 0d;
+			double width = 0d;
+			
+			double xCenterOfMassTop = 0d; // of equation
+			double yCenterOfMassTop = 0d; // of equation
+			double xCenterOfMass = 0d;
+			double yCenterOfMass = 0d;
+			
+			double leftHalf = 0d;
+			double rightHalf = 0d;
+			double topHalf = 0d;
+			double bottomHalf = 0d;
+			
+			double topLeftQuarter = 0d;
+			double bottomLeftQuarter = 0d;
+			double topRightQuarter = 0d;
+			double bottomRightQuarter = 0d;
+			
+			int[] rows = null;
+			int[] cols = null;
+			////////////////////////
+			
+			rows = new int[size];
+			cols = new int[size];
+			for (i = 0; i < size; i++) {
+				for (j = 0; j + i < size; j++) {
+					if (block[i][j] == one) {
+						rows[i]++;
+						cols[j]++;
+					}
+				}
+			}
+			xLeftIndex = -1;
+			xRightIndex = -1;
+			yTopIndex = -1;
+			yBotIndex = -1;
+			for (i = 0; i < size; i++) {
+				if (rows[i] > 0 && yTopIndex == -1) {
+					yTopIndex = i;
+				}
+				if (rows[size - i - 1] > 0 && yBotIndex == -1) {
+					yBotIndex = size - i;
+				}
+				if (cols[i] > 0 && xLeftIndex == -1) {
+					xLeftIndex = i;
+				}
+				if (cols[size - 1 - i] > 0 && xRightIndex == -1) {
+					xRightIndex = size - i;
+				}
+				if (xLeftIndex > -1 && xRightIndex > -1 && yTopIndex > -1 && yBotIndex > -1) {
+					break;
+				}
+			}
+			height = yBotIndex - yTopIndex;
+			width = xRightIndex - xLeftIndex;
+			xCenterOfMassTop = 0;
+			yCenterOfMassTop = 0;
+			for (i = 0; i < cols.length; i++) {
+				if (cols[i] > 0) {
+					xCenterOfMassTop += ((i + 0.5) * cols[i]);
+				}
+			}
+			for (i = 0; i < rows.length; i++) {
+				if (rows[i] > 0) {
+					yCenterOfMassTop += ((i + 0.5) * rows[i]);
+				}
+			}
+			xCenterOfMass = ((double) xCenterOfMassTop) / ((double) size);
+			yCenterOfMass = ((double) yCenterOfMassTop) / ((double) size);
+			if (xCenterOfMass > width / 2) {
+				if (yCenterOfMass > height / 2) {
+					rotation = 2;
+				}
+				else if (yCenterOfMass < height / 2) {
+					rotation = 1;
+				}
+				else {
+					rotation = 1;
+				}
+			}
+			else if (xCenterOfMass < width / 2) {
+				if (yCenterOfMass > height / 2) {
+					rotation = 3;
+				}
+				else if (yCenterOfMass < height / 2) {
+					rotation = 0;
+				}
+				else {
+					rotation = 3;
+				}
+			}
+			else {
+				if (yCenterOfMass > height / 2) {
+					rotation = 2;
+				}
+				else if (yCenterOfMass < height / 2) {
+					rotation = 0;
+				}
+				else {
+					topHalf = 0.0; bottomHalf = 0.0;
+					leftHalf = 0.0; rightHalf = 0.0;
+					for (i = 1; i < width / 2; i++) {
+						if (cols[i - 1] > 0) {
+							leftHalf += cols[i - 1];
+						}
+					}
+					for (i = (int) width - 1; i > width / 2; i--) {
+						if (cols[i] > 0) {
+							rightHalf += cols[i];
+						}
+					}
+					for (i = 1; i < height / 2; i++) {
+						if (rows[i - 1] > 0) {
+							topHalf += rows[i - 1];
+						}
+					}
+					for (i = (int) height - 1; i > height / 2; i--) {
+						if (rows[i] > 0) {
+							bottomHalf += rows[i];
+						}
+					}
+					rotation = -1;
+					if (topHalf > bottomHalf) {
+						if (leftHalf > rightHalf) {
+							rotation = 0;
+						}
+						else if (leftHalf < rightHalf) {
+							rotation = 1;
+						}
+						else {
+							rotation = 0;
+						}
+					}
+					else if (topHalf < bottomHalf) {
+						if (leftHalf > rightHalf) {
+							rotation = 3;
+						}
+						else if (leftHalf < rightHalf) {
+							rotation = 2;
+						}
+						else {
+							rotation = 2;
+						}
+					}
+					else {
+						if (leftHalf > rightHalf) {
+							rotation = 3;
+						}
+						else if (leftHalf < rightHalf) {
+							rotation = 1;
+						}
+						else {
+							rotation = -1;
+						}
+					}
+					if (rotation == -1) {
+						topLeftQuarter = 0.0; bottomLeftQuarter = 0.0;
+						topRightQuarter = 0.0; bottomRightQuarter = 0.0;
+						for (i = 1; i < width / 2; i++) {
+							for (j = 1; j < height / 2; j++) {
+								if (block[j - 1][i - 1] == one) {
+									topLeftQuarter++;
+								}
+							}
+							for (j = (int) height - 1; j > height / 2; j--) {
+								if (block[j][i - 1] == one) {
+									bottomLeftQuarter++;
+								}
+							}
+						}
+						for (i = (int) width - 1; i > width / 2; i--) {
+							for (j = 1; j < height / 2; j++) {
+								if (block[j - 1][i] == one) {
+									topRightQuarter++;
+								}
+							}
+							for (j = (int) height - 1; j > height / 2; j--) {
+								if (block[j][i] == one) {
+									bottomRightQuarter++;
+								}
+							}
+						}
+						if (topLeftQuarter > topRightQuarter && topLeftQuarter > bottomRightQuarter && topLeftQuarter > bottomLeftQuarter) {
+							rotation = 0;
+						}
+						else if (topRightQuarter > topLeftQuarter && topRightQuarter > bottomRightQuarter && topRightQuarter > bottomLeftQuarter) {
+							rotation = 1;
+						}
+						else if (bottomRightQuarter > topRightQuarter && bottomRightQuarter > topLeftQuarter && bottomRightQuarter > bottomLeftQuarter) {
+							rotation = 2;
+						}
+						else if (bottomLeftQuarter > topRightQuarter && bottomLeftQuarter > bottomRightQuarter && bottomLeftQuarter > topLeftQuarter) {
+							rotation = 3;
+						}
+						else {
+							if (blockCheck(format(block, 1))) {
+								rotation = 1;
+							}
+							else if (blockCheck(format(block, 2))) {
+								rotation = 2;
+							}
+							else if (blockCheck(format(block, 3))) {
+								rotation = 3;
+							}
+							else if (width > height) {
+								rotation = 1;
+							}
+							else {
+								rotation = 0;
+							}
+						}
+					}
+				}
+			}
+			
+			return rotation;
+		}
+
+		private char[][] format(char[][] block) {
+			return block = rotate(block, calculateRotation(block));
+		}
+		private char[][] format(char[][] block, int rot) {
+			return block = rotate(block, rot % 4);
+		}
+		private void add(char[][] block) {
+			block = format(block);
+			if (blockCheck(block)) {
+				return;
+			}
+			addToList(block);
+		}
+		private void addToList(char[][] block) {
+			String key = null;
+			//////////////////////
+			
+			key = getKeyString(block);
+			blocks.put(key, null);
+			print(false, key);
+		}
+		private String getKeyString(char[][] block) {
+			int i = 0, j = 0;
+			int count = 0;
+			int prevCount = 0;
+			int track = 0;
+			int total = 0;
+			
+			char[] keyChars = null;
+			String key = null;
+			//////////////////////
+			
+			keyChars = new char[size];
+			for (i = 0, count = 0; i < size; i++) {
+				for (j = 0; j + i < size; j++) {
+					if (total == size) {
+						break;
+					}
+					if (block[i][j] == '1') {
+						if (track > 0 && prevCount == 0) {
+							keyChars[track - 1] = (char) (65 + count);
+							prevCount = size;
+						}
+						else {
+							keyChars[track] = (char) (count + 48);
+							track++;
+							prevCount = count;
+						}
+						count = 0;
+						total++;
+					}
+					else {
+						count++;
+					}
+				}
+				if (total == size) {
+					break;
+				}
+			}
+			key = String.valueOf(keyChars);
+			
+			return key;
+		}
+		public void print(boolean end, String key) {
+			String print = null;
+			if (!end) {
+				print = String.format("%7d--- %s", blocks.size(), key);
+			}
+			else {
+				print = String.format("    END--- %s newBlocks()", comma(String.valueOf(newBlocks)));
+			}
+			System.out.println(print);
+		}
+		public void decrypt() {
+			Object[] arr = blocks.keySet().toArray();
+			for (int i = 0; i < arr.length; i++) {
+				char[] key = ((String) arr[i]).toCharArray();
+				System.out.println("------------------" + (i + 1) + " : " + blocks.get(String.valueOf(key)));
+				char[] act = new char[iteratedSize];
+				for (int j = 0, count = 0, tot = 0; tot < size && j < key.length; j++) {
+					char val = key[j];
+					if (val >= 65) {
+						int spaces = val - 65;
+						act[count] = '1';
+						tot++;
+						count++;
+						for (int k = 0; k < spaces; k++) {
+							count++;
+						}
+						act[count] = '1';
+						tot++;
+						count++;
+					}
+					else {
+						int spaces = val - 48;
+						for (int k = 0; k < spaces; k++) {
+							count++;
+						}
+						act[count] = '1';
+						tot++;
+						count++;
+					}
+				}
+				for (int j = size, count = 0; j > 0; j--) {
+					for (int k = 0; k < j; k++) {
+						if (act[count + k] == '1') {
+							System.out.print("O ");
+						}
+						else {
+							System.out.print("  ");
+						}
+					}
+					count += j;
+					System.out.println();
+				}
+			}
+			System.out.println(arr.length);
+		}
+		private char[][] newBlock() {
+			int i = 0, j = 0;
+			
+			char[][] newBlock = null;
+			//////////////////////
+			
+			newBlocks++;
+			newBlock = new char[size][];
+			for (i = 0; i < size; i++) {
+				newBlock[i] = new char[size - i];
+				for (j = 0; j  + i < size; j++) {
+					newBlock[i][j] = zero;
+				}
+			}
+			
+			return newBlock;
+		}
+		public long getNewBlocks() {
+			return this.newBlocks;
+		}
+	}
+	public static String comma(String str) {
+		int len = str.length();
+		if (len <= 3) {
+			return str;
+		}
+		else {
+			String formatted = "";
+			int top = len % 3;
+			int fix = (len - top) / 3;
+			if (top > 0) {
+				formatted += str.substring(0, top) + ",";
+			}
+			for (int i = 0; i < fix; i++) {
+				int start = (i * 3) + top;
+				int end = start + 3;
+				if (i == fix - 1) {
+					formatted += str.substring(start, end);
+				}
+				else {
+					formatted += str.substring(start, end) + ",";
+				}
+			}
+			return formatted;
+		}
+	}
+}
+
+
