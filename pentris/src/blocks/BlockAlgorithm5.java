@@ -5,7 +5,7 @@ import java.util.Map;
 public class BlockAlgorithm5 {
 	boolean logging = false;
 	public static void main(String[] args) {
-		int size = 9; // must be 11 or less
+		int size = 9; // must be 11 or lessss
 
 		long time1 = System.currentTimeMillis();
 
