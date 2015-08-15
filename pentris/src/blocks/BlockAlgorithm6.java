@@ -540,7 +540,7 @@ public class BlockAlgorithm6 {
 
 			key = getKeyString(block);
 			blocks.put(key, null);
-			if (logging) {
+			if (logging) { // logging
 				print(false, key);
 			}
 		}
