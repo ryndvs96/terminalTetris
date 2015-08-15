@@ -81,6 +81,9 @@ public class BlockAlgorithm6 {
 			if (round < size) {
 				for (i = 0; i < size; i++) {
 					for (j = 0; j + i < size && j + i <= round; j++) {
+//						if (newBlocks >= 15 && i == 0 && j == 3) {
+//							System.out.println();
+//						}
 						if (cellCheck(block, i, j)) {
 							copy = blockCopy(block);
 							copy[convert(i, j)] = one;
@@ -632,5 +635,3 @@ public class BlockAlgorithm6 {
 		}
 	}
 }
-
-
