@@ -543,7 +543,7 @@ public class BlockAlgorithm6 {
 
 			key = getKeyString(block);
 			blocks.put(key, null);
-			if (logging) { // logging
+			if (logging) { 
 				print(false, key);
 			}
 		}
