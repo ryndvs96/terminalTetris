@@ -104,8 +104,8 @@ bool * Blocks::rotate(bool block[], int times) {
 	bool * copy;
 	//////////////////////
 
-	rows = new int[size];
-	cols = new int[size];
+	rows = (int *) calloc(sizeof(int), size);
+	cols = (int *) calloc(sizeof(int), size);
 	breaker = false;
 	for (i = 0; i < size; i++) {
 		for (j = 0; j + i < size; j++) {
@@ -197,8 +197,8 @@ int Blocks::calculateRotation(bool block[]) {
 	int * cols;
 	////////////////////////
 
-	rows = new int[size];
-	cols = new int[size];
+	rows = (int *) calloc(sizeof(int), size);
+	cols = (int *) calloc(sizeof(int), size);
 	for (i = 0; i < size; i++) {
 		for (j = 0; j + i < size; j++) {
 			if (block[convert(i, j)] == one) {
@@ -403,7 +403,7 @@ string Blocks::getKeyString(bool block[]) {
 	char * key;
 	//////////////////////
 
-	keyChars = new char[size];
+	keyChars = (char *) calloc(sizeof(char), size);
 	for (i = 0, count = 0; i < iteratedSize; i++) {
 		if (total == size) {
 			break;
@@ -530,6 +530,7 @@ bool * Blocks::format(bool block[], int rot) {
 void Blocks::add(bool block[]) {
 	block = format(block);
 	if (blockCheck(block)) {
+		delete(block);
 		return;
 	}
 	addToList(block);
