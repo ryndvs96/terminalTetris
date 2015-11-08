@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 public class BlockAlgorithm3 {
 	public static void main(String[] args) {
-		int size = 9; // must be 11 or less
+		int size = 7; // must be 11 or less
 		long time1 = System.currentTimeMillis();
 		Blocks blocks = (new BlockAlgorithm3()).new Blocks(size);
 		blocks.build();

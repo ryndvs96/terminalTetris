@@ -8,7 +8,7 @@ public class BlockAlgorithm4Analysis {
 	boolean logging = true;
 	public static void main(String[] args) {
 		Runtime run = Runtime.getRuntime();
-		byte size = 9; // must be 11 or less
+		byte size = 7; // must be 11 or less
 		long time1 = System.currentTimeMillis();
 
 		run.gc();

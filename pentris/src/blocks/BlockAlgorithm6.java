@@ -3,7 +3,7 @@ package blocks;
 import java.util.HashMap;
 import java.util.Map;
 public class BlockAlgorithm6 {
-	boolean logging = true;
+	boolean logging = false;
 	public static void main(String[] args) {
 		int size = 9; // must be 11 or less
 

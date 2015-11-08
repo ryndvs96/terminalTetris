@@ -2,14 +2,14 @@ package blocks;
 
 import java.util.HashMap;
 import java.util.Map;
-public class BlockAlgorithm5 {
-	boolean logging = false;
+public class BlockAlgorithm7 {
+	boolean logging = true;
 	public static void main(String[] args) {
-		int size = 7; // must be 11 or lessss
+		int size = 8; // must be 11 or less
 
 		long time1 = System.currentTimeMillis();
 
-		Blocks blocks = (new BlockAlgorithm5()).new Blocks(size);
+		Blocks blocks = (new BlockAlgorithm7()).new Blocks(size);
 		blocks.build();
 
 		long time2 = System.currentTimeMillis();
@@ -18,7 +18,7 @@ public class BlockAlgorithm5 {
 
 		String newBlocks = String.valueOf(blocks.getNewBlocks());
 		System.out.println(String.format(time + " seconds : " + comma(newBlocks) 
-				+ " new Blocks() : %.3f megabytes used : For " + size + " block piece. : " + blocks.blocks.size() + " pieces", 0d));
+		+ " new Blocks() : %.3f megabytes used : For " + size + " block piece. : " + blocks.blocks.size() + " pieces", 0d));
 	}
 	public class Blocks {
 		public Map<String, Object> blocks = null;
@@ -44,11 +44,11 @@ public class BlockAlgorithm5 {
 			int halfsize = 0;
 			int round = 0;
 
-			boolean[][] block = null;
+			boolean[] block = null;
 			//////////////////////
 
 			block = newBlock();
-			block[0][0] = one;
+			block[0] = one;
 			build(block, 1);
 			if (size >= 5) {
 				halfsize = size % 2 == 0 ? (size / 2) : (size - 1) / 2;
@@ -57,14 +57,14 @@ public class BlockAlgorithm5 {
 						round = 0;
 						block = newBlock();
 						for (k = 0; k < j; k++) {
-							block[i][k] = one;
+							block[convert(i, k)] = one;
 							round++;
 						}
 						for (k = 0; k < i; k++) {
-							block[k][j] = one;
+							block[convert(k, j)] = one;
 							round++;
 						}
-						block[i][j] = one;
+						block[convert(i, j)] = one;
 						round++;
 						build(block, round);
 					}
@@ -72,10 +72,10 @@ public class BlockAlgorithm5 {
 			}
 		}
 
-		private void build(boolean[][] block, int round) {
+		private void build(boolean[] block, int round) {
 			int i = 0, j = 0;
 
-			boolean[][] copy = null;
+			boolean[] copy = null;
 			//////////////////////
 
 			if (round < size) {
@@ -83,7 +83,7 @@ public class BlockAlgorithm5 {
 					for (j = 0; j + i < size && j + i <= round; j++) {
 						if (cellCheck(block, i, j)) {
 							copy = blockCopy(block);
-							copy[i][j] = one;
+							copy[convert(i, j)] = one;
 							build(copy, round + 1);
 						}
 					}
@@ -93,7 +93,7 @@ public class BlockAlgorithm5 {
 				add(block);
 			}
 		}
-		private boolean[][] rotate(boolean[][] block, int times) {
+		private boolean[] rotate(boolean[] block, int times) {
 			if (times == 0) {
 				return block;
 			}
@@ -108,7 +108,7 @@ public class BlockAlgorithm5 {
 
 			int[] rows = null;
 			int[] cols = null;
-			boolean[][] copy = null;
+			boolean[] copy = null;
 			//////////////////////
 
 			rows = new int[size];
@@ -116,7 +116,7 @@ public class BlockAlgorithm5 {
 			breaker = false;
 			for (i = 0; i < size; i++) {
 				for (j = 0; j + i < size; j++) {
-					if (block[i][j] == one) {
+					if (block[convert(i, j)] == one) {
 						rows[i]++;
 						breaker = true;
 						break;
@@ -129,7 +129,7 @@ public class BlockAlgorithm5 {
 			breaker = false;
 			for (i = size - 1; i >= 0 ; i--) {
 				for (j = 0; j + i < size; j++) {
-					if (block[j][i] == one) {
+					if (block[convert(j, i)] == one) {
 						cols[size - i - 1]++;
 						breaker = true;
 						break;
@@ -161,7 +161,7 @@ public class BlockAlgorithm5 {
 					if (newi < 0 || newj < 0 || (newi + newj >= size)) {
 						continue;
 					}
-					copy[newi][newj] = block[i][j];
+					copy[convert(newi, newj)] = block[convert(i, j)];
 				}
 			}
 			if (times > 1) {
@@ -172,7 +172,7 @@ public class BlockAlgorithm5 {
 			}
 		}
 
-		private int calculateRotation(boolean[][] block) {
+		private int calculateRotation(boolean[] block) {
 			int i = 0, j = 0;
 
 			int xLeftIndex = -1;
@@ -208,7 +208,7 @@ public class BlockAlgorithm5 {
 			cols = new int[size];
 			for (i = 0; i < size; i++) {
 				for (j = 0; j + i < size; j++) {
-					if (block[i][j] == one) {
+					if (block[convert(i, j)] == one) {
 						rows[i]++;
 						cols[j]++;
 					}
@@ -342,24 +342,24 @@ public class BlockAlgorithm5 {
 						topRightQuarter = 0.0f; bottomRightQuarter = 0.0f;
 						for (i = 1; i < width / 2; i++) {
 							for (j = 1; j < height / 2; j++) {
-								if (block[j - 1][i - 1] == one) {
+								if (block[convert(j - 1, i - 1)] == one) {
 									topLeftQuarter++;
 								}
 							}
 							for (j = (int) height - 1; j > height / 2; j--) {
-								if (block[j][i - 1] == one) {
+								if (block[convert(j, i - 1)] == one) {
 									bottomLeftQuarter++;
 								}
 							}
 						}
 						for (i = (int) width - 1; i > width / 2; i--) {
 							for (j = 1; j < height / 2; j++) {
-								if (block[j - 1][i] == one) {
+								if (block[convert(j - 1, i)] == one) {
 									topRightQuarter++;
 								}
 							}
 							for (j = (int) height - 1; j > height / 2; j--) {
-								if (block[j][i] == one) {
+								if (block[convert(j, i)] == one) {
 									bottomRightQuarter++;
 								}
 							}
@@ -399,8 +399,8 @@ public class BlockAlgorithm5 {
 			return rotation;
 		}
 
-		private String getKeyString(boolean[][] block) {
-			int i = 0, j = 0;
+		private String getKeyString(boolean[] block) {
+			int i = 0;
 			int count = 0;
 			int prevCount = 0;
 			int track = 0;
@@ -411,69 +411,64 @@ public class BlockAlgorithm5 {
 			//////////////////////
 
 			keyChars = new char[size];
-			for (i = 0, count = 0; i < size; i++) {
-				for (j = 0; j + i < size; j++) {
-					if (total == size) {
-						break;
-					}
-					if (block[i][j]) {
-						if (track > 0 && prevCount == 0) {
-							keyChars[track - 1] = (char) (65 + count);
-							prevCount = size;
-						}
-						else {
-							keyChars[track] = (char) (count + 48);
-							track++;
-							prevCount = count;
-						}
-						count = 0;
-						total++;
-					}
-					else {
-						count++;
-					}
-				}
+			for (i = 0, count = 0; i < iteratedSize; i++) {
 				if (total == size) {
 					break;
 				}
+				if (block[i]) {
+					if (track > 0 && prevCount == 0) {
+						keyChars[track - 1] = (char) (65 + count);
+						prevCount = size;
+					}
+					else {
+						keyChars[track] = (char) (48 + count);
+						track++;
+						prevCount = count;
+					}
+					count = 0;
+					total++;
+				}
+				else {
+					count++;
+				}
 			}
-			key = String.valueOf(keyChars);
+			key = String.valueOf(keyChars).trim();
 			return key;
 		}
-		private boolean cellCheck(boolean[][] block, int i, int j) {
+		private boolean cellCheck(boolean[] block, int i, int j) {
 			int nullCount = 0;
 			//////////////////////
 
 			nullCount = 0;
-			if (block[i][j] == one) {
+			if (block[convert(i, j)] == one) {
 				return false;
 			}
 			try {
-				if (block[i + 1][j] != one) {
+				if (block[convert(i + 1, j)] != one) {
 					nullCount++;
 				}
-			} catch (Exception e) {
+			} catch (ArrayIndexOutOfBoundsException e) {
 				nullCount++;
 			}
 			try {
-				if (block[i - 1][j] != one) {
+				if (block[convert(i - 1, j)] != one) {
 					nullCount++;
 				}
-			} catch (Exception e) {
+			} catch (ArrayIndexOutOfBoundsException e) {
 				nullCount++;
 			}
 			try {
-				if (block[i][j + 1] != one) {
+				if (block[convert(i, j + 1)] != one) {
 					nullCount++;
 				}
-			} catch (Exception e) {
+			} catch (ArrayIndexOutOfBoundsException e) {
 				nullCount++;
 			}
 			try {
-				if (block[i][j - 1] != one) {
+				if (block[convert(i, j - 1)] != one) {
 					nullCount++;
 				}
-			} catch (Exception e) {
+			} catch (ArrayIndexOutOfBoundsException e) {
 				nullCount++;
 			}
 			if (nullCount != 4) {
@@ -483,60 +478,73 @@ public class BlockAlgorithm5 {
 				return false;
 			}
 		}
-		private boolean[][] blockCopy(boolean[][] block) {
+		private int convert(int i, int j) {
+			int k = 0;
+			int tot = 0;
+			int iSum = 0;
+			////////////////////////
+
+			if (i < 0 || j < 0 || i + j >= size) {
+				return -1;
+			}
+			for (k = 0; k < i; k++) {
+				int itSize = (size - k);
+				iSum += itSize;
+			}
+			tot = j + iSum;
+			return tot;
+		}
+		private boolean[] blockCopy(boolean[] block) {
 			int i = 0, j = 0;
 
-			boolean[][] blockCopy = null;
-			//////////////////////
+			boolean[] blockCopy = null;
+			///////////////////////
 
 			blockCopy = newBlock();
 			for (i = 0; i < size; i++) {
 				for (j = 0; j + i < size; j++) {
-					blockCopy[i][j] = block[i][j];
+					blockCopy[convert(i, j)] = block[convert(i, j)];
 				}
 			}
 			return blockCopy;
 		}
-		private boolean[][] newBlock() {
-			int i = 0, j = 0;
+		private boolean[] newBlock() {
+			int i = 0;
 
-			boolean[][] newBlock = null;
+			boolean[] newBlock = null;
 			//////////////////////
 
 			newBlocks++;
-			newBlock = new boolean[size][];
+			newBlock = new boolean[iteratedSize];
 			for (i = 0; i < size; i++) {
-				newBlock[i] = new boolean[size - i];
-				for (j = 0; j  + i < size; j++) {
-					newBlock[i][j] = zero;
-				}
+				newBlock[i] = zero;
 			}
 			return newBlock;
 		}
-		private boolean[][] format(boolean[][] block) {
+		private boolean[] format(boolean[] block) {
 			return block = rotate(block, calculateRotation(block));
 		}
-		private boolean[][] format(boolean[][] block, int rot) {
+		private boolean[] format(boolean[] block, int rot) {
 			return block = rotate(block, rot % 4);
 		}
-		private void add(boolean[][] block) {
+		private void add(boolean[] block) {
 			block = format(block);
 			if (blockCheck(block)) {
 				return;
 			}
 			addToList(block);
 		}
-		private void addToList(boolean[][] block) {
+		private void addToList(boolean[] block) {
 			String key = null;
 			//////////////////////
 
 			key = getKeyString(block);
 			blocks.put(key, null);
-			if (logging) {
+			if (logging) { 
 				print(false, key);
 			}
 		}
-		private boolean blockCheck(boolean[][] block) {
+		private boolean blockCheck(boolean[] block) {
 			return blocks.containsKey(getKeyString(block));
 		}
 		public void print(boolean end, String key) {
@@ -624,5 +632,3 @@ public class BlockAlgorithm5 {
 		}
 	}
 }
-
-
